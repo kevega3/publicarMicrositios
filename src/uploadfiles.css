@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap'); 
+
+
+
+.contedorArchivosProcesados{
+    font-family: 'Work Sans', sans-serif;
+    background: #FAFAFA;
+    border: 1px solid #e3e3e3;
+    border-radius: 8px;
+    padding: 10px 20px 30px 30px; 
+    min-height:150px ;
+}
+
+.errorArchivos{
+    font-weight: bold;
+    color: red;
+}
+.sucessArchivos{
+    font-weight: bold;
+    color: green;
+}
+.marcaSucces{
+    padding: 7px;
+    border: 1px solid green;
+    border-radius: 10px;
+    color: white;
+    background: green;
+}
+.marcaError{
+    padding: 7px;
+    border: 1px solid red;
+    border-radius: 10px;
+    color: white;
+    background: red;
+}
