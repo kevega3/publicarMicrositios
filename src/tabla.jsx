@@ -71,7 +71,7 @@ export const TableBasic = ({ data }) => {
         responsive: 'standard',
         fixedHeader: true,
         fixedSelectColumn: true,
-        tableBodyHeight: '600px',
+        // tableBodyHeight: '600px',
         selectableRowsHideCheckboxes: false,
         selectableRows: false,
         searchOpen: true,

@@ -1,20 +1,15 @@
 
-import './App.css';
-import {Formulario} from './uploadfile'
+import './css/App.css';
+import {Formulario} from './formulario'
 import {Bar} from './processbar'
-import {BarCircular} from './processCircular'
-import { Avatar, List } from 'antd';
 import { useState,useEffect } from "react";
-import logo from './ADA-BRAZOS-CRUZADOS-MEDIO-CUERPO-1.png';
+
 import { Collapse, Divider } from 'antd';
 import axios from 'axios'
 import { message,Button } from 'antd';
 import { TableBasic } from "./tabla";
-const data = [
-  {
-    title: 'ADA',
-  }
-];
+import { Terminos } from "./terminosDeUso";
+
 
 function App() {
   const [porcentaje, setporcentaje] = useState(0);
@@ -22,7 +17,7 @@ function App() {
   const [tipoError, setipoError] = useState(true);
   const [numeroArchivosError, setnumeronumeroArchivosError] = useState(0);
   const [fileData, setFileData] = useState([]);
-
+  const [terminosUso, seterminosUso] = useState(false);
   
   
 
@@ -31,7 +26,11 @@ const cetearvalores =  async () => {
   setnumeroArchivos(0)
   setporcentaje(0)
   setFileData([])
+  setipoError(true)
+  seterminosUso(true)
+  
 }
+
 
 
 
@@ -42,7 +41,6 @@ const CargarArchivosCAC = async (fileList) => {
       let numeroArchivosCargos = 0
       let numeroArchivosError = 0
       let newPorcentaje = 0
-      setipoError(true)
       
       for (const file of fileList) {
           const formData = new FormData();
@@ -50,7 +48,7 @@ const CargarArchivosCAC = async (fileList) => {
           formData.append('fileName', file.name);
           formData.append('fileExtension', file.extension);
 
-          const response = await axios.post('http://192.168.1.28:2880/pruebasazure', formData, {
+          const response = await axios.post('http://api-pruebas.cuentadealtocosto.org/pruebasazure', formData, {
               headers: {
                   'Content-Type': 'multipart/form-data'
               }
@@ -58,16 +56,15 @@ const CargarArchivosCAC = async (fileList) => {
           if (response.status === 200) {
               numeroArchivosCargos+= 1              
               setnumeroArchivos(numeroArchivosCargos) 
-              uploadedFiles += 1;
-              newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
-              setporcentaje(newPorcentaje);
           } else {
               message.error(`Error ${response.data.ayuda}.`,4);
               numeroArchivosError+= 1              
               setnumeronumeroArchivosError(numeroArchivosError) 
               setipoError(false)
           }
-
+          uploadedFiles += 1;
+          newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
+          setporcentaje(newPorcentaje);
           const newFileData = {
             name: file.name,
             extension: file.extension,
@@ -77,7 +74,7 @@ const CargarArchivosCAC = async (fileList) => {
           
           setFileData((prevData) => [...prevData, newFileData]);
       }
-      if(newPorcentaje === 100){
+      if(newPorcentaje === 100 &&  porcentaje){
         message.success('Todos los archivos han sido cargados correctamente.');
       }else{
         message.warning('Error al cargar algunos archivos, descargue el archivo para mas detalles',4);
@@ -89,24 +86,26 @@ const CargarArchivosCAC = async (fileList) => {
       message.error('Error al cargar algunos archivos.'+ error);
       console.log(error);
   }
-};
-
-
-  
+};  
   return (
     <div className="App">
-      <h1>Asistente de Cargue Archivos SISCAC 3.0</h1>
+      <h1>Asistente de Cargue Archivos SISCAC 4.0</h1>
+      {terminosUso ? (
+        <>
         {porcentaje !== 0  && (
           <Bar porjentaje={porcentaje} tipoError ={tipoError}/>
         )}
         {<Formulario  handleUploadFiles={CargarArchivosCAC} numeroArchivos ={numeroArchivos} numeroArchivosError = {numeroArchivosError} cetearvalores ={cetearvalores} fileData = {fileData} /> }
       <br/>
-
         {fileData.length > 0 && (
           <Collapse  size="large" items={[{ key: '1', label: 'Aquí descubres los detalles del cargue', children: <TableBasic data={fileData} />}]}/>
           )}
-          
-          
+        </>
+      ) : (
+        <Terminos  cetearvalores={cetearvalores}/>
+      )}
+
+
     </div>
   );
 }

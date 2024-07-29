@@ -3,14 +3,11 @@ import { InboxOutlined,LeftOutlined,CloudUploadOutlined } from '@ant-design/icon
 import { message, Upload, Button  } from 'antd';
 import { Col, Row } from 'antd';
 import { gold,green } from '@ant-design/colors';
-import './uploadfiles.css';
+import './css/uploadfiles.css';
 const { Dragger } = Upload;
 
 export const Formulario = (props ) => {
     const [fileList, setFileList] = useState([]);
-    
-    
-    const [loadings, setLoadings] = useState([]);
     const [Archivos, setArchivos] = useState([]);
     const [botonVolver,setbotonVolver] = useState(false)
     
@@ -37,21 +34,7 @@ export const Formulario = (props ) => {
         props.cetearvalores()
         
     };
-    
-    const enterLoading = (index) => {
-    setLoadings((prevLoadings) => {
-        const newLoadings = [...prevLoadings];
-        newLoadings[index] = true;
-        return newLoadings;
-    });
-    setTimeout(() => {
-        setLoadings((prevLoadings) => {
-        const newLoadings = [...prevLoadings];
-        newLoadings[index] = false;
-        return newLoadings;
-        });
-    }, 2000);
-    };
+
 
     const handleBeforeUpload = (file) => {
         const reader = new FileReader();
@@ -192,7 +175,6 @@ export const Formulario = (props ) => {
                             icon={<CloudUploadOutlined />}
                             size="large"
                             style={{ backgroundColor: green[6], borderColor: green[6], margin: 20 }} // Usa el color importado
-                            loading={loadings[1]}
                             onClick={() => EnviarInfo(Archivos)}
                             disabled={shouldDisableButton()}
                         >

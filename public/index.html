@@ -23,10 +23,14 @@
         h2,h3,h4{
             font-family: 'Work Sans', sans-serif;
         }
+        ul,li{
+          font-family: 'Work Sans', sans-serif;
+          font-size: 15px;
+        }
         .wrapper {
         display: flex;
         flex-direction: column;
-        min-height: 92vh;
+        min-height: 93vh;
         
         }
         
@@ -37,9 +41,9 @@
         
         footer {
         height: 50px;
-        background: #f4f4f4;
+        background: #e4e4e4d7;
         padding: 20px 0;
-        border-top: 1px solid #d0d0d0d7;
+        border-top: 1px solid #b9b9b9d7;
         text-align: center;
         }
 
@@ -49,10 +53,31 @@
             height: 65px;
             padding-left: 60px;
         }
+      
+      .custom-scrollbar {
+        overflow: auto;
+      }
+
+      
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 10px; /* Ancho del scrollbar vertical */
+        height: 2px; /* Alto del scrollbar horizontal */
+      }
+
+      
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: darkgrey; /* Color del thumb */
+        border-radius: 10px; /* Bordes redondeados del thumb */
+      }
+
+      
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Color de la pista */
+      }
     </style>
   </head>
   
-  <body style="margin: 0;">
+  <body style="margin: 0;" class="custom-scrollbar">
     <div class="navCac"><img src="https://cuentadealtocosto.org/wp-content/uploads/2019/10/logo.svg" width="150" alt="">
     </div>
     <div class="wrapper">
