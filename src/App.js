@@ -1,25 +1,33 @@
 
 import './css/App.css';
+import getConfig  from './config.json';
 import {Formulario} from './formulario'
 import {Bar} from './processbar'
-import { useState,useEffect } from "react";
-
-import { Collapse, Divider } from 'antd';
+import { useState ,useEffect} from "react";
+import { Collapse } from 'antd';
 import axios from 'axios'
-import { message,Button } from 'antd';
+import { message } from 'antd';
 import { TableBasic } from "./tabla";
 import { Terminos } from "./terminosDeUso";
 
 
-function App() {
+function App({ data }) {
   const [porcentaje, setporcentaje] = useState(0);
   const [numeroArchivos, setnumeroArchivos] = useState(0);
   const [tipoError, setipoError] = useState(true);
   const [numeroArchivosError, setnumeronumeroArchivosError] = useState(0);
   const [fileData, setFileData] = useState([]);
   const [terminosUso, seterminosUso] = useState(false);
+  const [ParametrosAPI, setParametrosAPI] = useState(data);
+  const [ParametrosString, setParametrosString] = useState('');
   
-  
+
+  useEffect(() => {
+    setParametrosAPI(data);
+    
+    
+}, [data]); 
+
 
 const cetearvalores =  async () => {
   setnumeronumeroArchivosError(0)
@@ -31,7 +39,10 @@ const cetearvalores =  async () => {
   
 }
 
-
+// const ValidarExtencion = async (extencionArchivo) => {
+//   const l = extencionArchivo.includes(ParametrosString) ? true : false
+//   return l
+// }
 
 
 const CargarArchivosCAC = async (fileList) => {
@@ -41,14 +52,21 @@ const CargarArchivosCAC = async (fileList) => {
       let numeroArchivosCargos = 0
       let numeroArchivosError = 0
       let newPorcentaje = 0
-      
+
       for (const file of fileList) {
           const formData = new FormData();
           formData.append('file', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
           formData.append('fileName', file.name);
           formData.append('fileExtension', file.extension);
+          // const l = await ValidarExtencion(file.extension)
+          // if(l!==true){
+          //     message.error(`Error el archivo no es permitido cargarlo debido a su extensión`,4);
+          //     numeroArchivosError+= 1              
+          //     setnumeronumeroArchivosError(numeroArchivosError) 
+          //     setipoError(false) 
+          // }
 
-          const response = await axios.post('http://api-pruebas.cuentadealtocosto.org/pruebasazure', formData, {
+          const response = await axios.post(`${getConfig.apiUrl}/pruebasazure`, formData, {
               headers: {
                   'Content-Type': 'multipart/form-data'
               }
@@ -74,7 +92,8 @@ const CargarArchivosCAC = async (fileList) => {
           
           setFileData((prevData) => [...prevData, newFileData]);
       }
-      if(newPorcentaje === 100 &&  porcentaje){
+      
+      if(newPorcentaje === 100 &&  tipoError === true){
         message.success('Todos los archivos han sido cargados correctamente.');
       }else{
         message.warning('Error al cargar algunos archivos, descargue el archivo para mas detalles',4);
@@ -87,6 +106,9 @@ const CargarArchivosCAC = async (fileList) => {
       console.log(error);
   }
 };  
+
+
+
   return (
     <div className="App">
       <h1>Asistente de Cargue Archivos SISCAC 4.0</h1>
@@ -102,10 +124,8 @@ const CargarArchivosCAC = async (fileList) => {
           )}
         </>
       ) : (
-        <Terminos  cetearvalores={cetearvalores}/>
+        <Terminos  cetearvalores={cetearvalores}  extenciones ={ParametrosAPI} />
       )}
-
-
     </div>
   );
 }

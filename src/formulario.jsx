@@ -79,7 +79,7 @@ export const Formulario = (props ) => {
             message.error(`${info.file.name} file upload failed.`);
         }
     };
-        // Procesa directorios y sus archivos recursivamente
+
         const processDirectory = (directoryEntry) => {
             const directoryReader = directoryEntry.createReader();
             directoryReader.readEntries(entries => {
@@ -96,7 +96,7 @@ export const Formulario = (props ) => {
         e.preventDefault();
         const { items } = e.dataTransfer;
     
-        // Procesa los archivos y carpetas
+
         Array.from(items).forEach(item => {
             if (item.kind === 'file') {
                 
@@ -104,7 +104,7 @@ export const Formulario = (props ) => {
                 console.log(file)
                 handleBeforeUpload(file);
             } else if (item.kind === 'directory') {
-                // Para carpetas, necesitamos procesar los archivos en la estructura de directorios
+                
                 const directoryReader = item.webkitGetAsEntry().createReader();
                 directoryReader.readEntries(entries => {
                     entries.forEach(entry => {

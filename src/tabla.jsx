@@ -11,8 +11,8 @@ export const TableBasic = ({ data }) => {
             filter: true,
             
             fixedHeader : true,
-            setCellProps: () => ({style: {whiteSpace:'nowrap', backgroundColor: '#CACACA', textAlign:'Center'}}),
-            setCellHeaderProps: () => ({style: { backgroundColor: '#17539C', color:"white"}})
+            setCellProps: () => ({style: {whiteSpace:'nowrap', backgroundColor: '#CACACA', textAlign:'left'}}),
+            setCellHeaderProps: () => ({style: { backgroundColor: '#17539C', color:"white"}}),
           }
         },
         {
@@ -21,7 +21,16 @@ export const TableBasic = ({ data }) => {
           options: {
             filter: true,
             setCellProps: () => ({style: {whiteSpace:'nowrap'}}),
-            setCellHeaderProps: () => ({style: { backgroundColor: '#17539C', color:"white"}})
+            setCellHeaderProps: () => ({style: { backgroundColor: '#17539C', color:"white"}}),
+            customBodyRender: (value) => {
+              return(
+                <center>
+                  <span>
+                    {value}
+                  </span>
+                </center>
+              );
+            }
           }
         },
         
@@ -46,9 +55,11 @@ export const TableBasic = ({ data }) => {
                 tagBackGround = '#fff2e8'
               }
               return (
-                <span style={{ color: tagColor, padding: '5px',border: tagBorder, borderRadius: '5px', background: tagBackGround }}>
-                  {value}
-                </span>
+                <center>
+                  <span style={{ color: tagColor, padding: '5px',border: tagBorder, borderRadius: '5px', background: tagBackGround }}>
+                    {value}
+                  </span>
+                </center>
               );
             },
           },
