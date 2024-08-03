@@ -22,7 +22,6 @@ const Index = () => {
   useEffect(() => {
     axios.get(`${getConfig.apiUrl}/TraerParametros`) 
       .then(data => {
-        
         setParametros(data.data);
       })
       .catch(error => {
@@ -32,7 +31,7 @@ const Index = () => {
 
   return (
     <>
-    {Parametros.length > 0 ? (
+    {Parametros.hasOwnProperty('epsCargueAzure')  && Parametros.hasOwnProperty('parametrosCargueAzure') ? (
       <App data={Parametros} />
     ) : (
       <Spin tip="Cargado..." size="large">

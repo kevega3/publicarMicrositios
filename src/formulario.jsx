@@ -1,16 +1,25 @@
 import React, { useState,useEffect } from 'react';
-import { InboxOutlined,LeftOutlined,CloudUploadOutlined } from '@ant-design/icons';
+import { InboxOutlined,LeftOutlined,SelectOutlined,FileDoneOutlined } from '@ant-design/icons';
 import { message, Upload, Button  } from 'antd';
 import { Col, Row } from 'antd';
-import { gold,green } from '@ant-design/colors';
+import {Transfers} from './trasnfer' 
+import { gold,green,blue } from '@ant-design/colors';
 import './css/uploadfiles.css';
+
+
 const { Dragger } = Upload;
 
 export const Formulario = (props ) => {
+    const Swal = require('sweetalert2')
     const [fileList, setFileList] = useState([]);
     const [Archivos, setArchivos] = useState([]);
     const [botonVolver,setbotonVolver] = useState(false)
     
+    const [dataEntidades,setdataEntidades] = useState(props.epsAPI)
+    
+    useEffect(() => {
+        setArchivos(Archivos);
+    }, [Archivos]);
     
     const [archivosProcesados, setArchivosProcesados] = useState(props.numeroArchivos);
     const [numeroArchivosError, setnumeroArchivosError] = useState(props.numeroArchivosError);
@@ -60,14 +69,26 @@ export const Formulario = (props ) => {
     const shouldDisableButton = () => { 
         return Archivos.length === 0; 
     };
-
+    
 
     const EnviarInfo = async (Archivos) => {
-        setbotonVolver(true)
-        setArchivos([])
-        await props.handleUploadFiles(Archivos)
-        
-        setbotonVolver(false)
+        const result = await Swal.fire({
+            title: "¿Está seguro de enviar cargar los archivos?",
+            text: "El asistente tomará cada archivo y de acuerdo al nombre del mismo lo alojará en el micrositio de la entidad.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí"
+        });
+
+        if (result.isConfirmed) {
+            setbotonVolver(true)
+            setArchivos([])
+            await props.handleUploadFiles(Archivos)
+            setbotonVolver(false)
+        }
+
     }
     const handleOnChange = (info) => {
         if (info.file.status !== 'uploading') {
@@ -92,6 +113,8 @@ export const Formulario = (props ) => {
                 });
             });
         };
+
+
     const handleOnDrop = (e) => {
         e.preventDefault();
         const { items } = e.dataTransfer;
@@ -101,7 +124,7 @@ export const Formulario = (props ) => {
             if (item.kind === 'file') {
                 
                 const file = item.getAsFile();
-                console.log(file)
+                
                 handleBeforeUpload(file);
             } else if (item.kind === 'directory') {
                 
@@ -119,6 +142,8 @@ export const Formulario = (props ) => {
             }
         });
     };
+
+
     const propss = {
         name: 'file',
         directory: true,
@@ -131,6 +156,9 @@ export const Formulario = (props ) => {
     
     return (
         <div className='ContenedorGeneralUpload'> 
+
+
+
             {fileList.length === 0 && ( 
             <Dragger {...propss}>
                 <p className="ant-upload-drag-icon">
@@ -141,12 +169,15 @@ export const Formulario = (props ) => {
                 
             </Dragger>
             )}
+
             <br/>
-            {fileList.length > 0 && (
+            
+            {fileList.length > 0 && ( 
                 <><Row className='contedorArchivosProcesados'>
-                    <Col span={12}>
+                    <Col span={8}>
                         <h2>Resultados del análisis:</h2>
                         <h3>Archivos detectados: {fileList.length}</h3>
+                        <h3>Tamaño total archivos a cargar:  { (fileList.reduce((total, file) => total + (file.size || 0), 0) / 1000).toFixed(2) } KB </h3>
                         {archivosProcesados > 0 && (
                             <h3 className='sucessArchivos'>Número archivos cargados con éxito: <span className='marcaSucces'>{archivosProcesados} </span></h3>
                         )}
@@ -159,32 +190,42 @@ export const Formulario = (props ) => {
                 <Row>
                     
                 </Row  >
-                    <Col span={12} justify="end" align="end">
+                    <Col span={16} justify="end" align="end">
+                    <h2>Seleccione el tipo cargue</h2>
+                        <Button
+                            type="primary"
+                            icon={<FileDoneOutlined  />}
+                            size="medium"
+                            style={{ backgroundColor: green[6], borderColor: green[6], margin: 20}} // Usa el color importado
+                            onClick={() => EnviarInfo(Archivos)}
+                            disabled={shouldDisableButton()}
+                        >Cargue por nombres archivos
+                        </Button>
+                        
+
+                        <Transfers 
+                            epsAPI = {dataEntidades}
+                            funciondesabilitar={shouldDisableButton}  
+                            EnviarArchivosEntidades={props.funcionEnviar}
+                            Archivos = {Archivos}
+                            setArchivos={setArchivos}
+                        />
+                        <br />
+                        <br />
                         <Button
                             type="primary"
                             icon={<LeftOutlined />}
                             size="large"
                             onClick={handleResetFileList}
-                            style={{ backgroundColor: gold[6], borderColor: gold[6] }} // Usa el color importado
+                            style={{ backgroundColor: gold[6], borderColor: gold[6] ,textoColor:'white'}} // Usa el color importado
                             disabled={_habilitarBoton()}
                         >Volver
                         </Button>
-                        <Button
-                        
-                            type="primary"
-                            icon={<CloudUploadOutlined />}
-                            size="large"
-                            style={{ backgroundColor: green[6], borderColor: green[6], margin: 20 }} // Usa el color importado
-                            onClick={() => EnviarInfo(Archivos)}
-                            disabled={shouldDisableButton()}
-                        >
-                        Cargar Archivos
-                        </Button>            
                     </Col>
                     
                 </Row><Row>
                     </Row></>
-            )}  
+            )}   
             
         </div>
     );
