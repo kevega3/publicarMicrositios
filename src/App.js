@@ -56,18 +56,22 @@ const EnviarArchivosEntidades = async (Archivos,valoresSeleccionados)=>{
       let numeroArchivosError = 0
       let newPorcentaje = 0
       let l = 0
-      for (const file of Archivos) {
-      
+      for (const valor  of valoresSeleccionados) {
           const formData = new FormData();
-          formData.append('file', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
-          formData.append('fileName', file.name);
-          formData.append('fileExtension', file.extension);
-          formData.append('Entidad', valoresSeleccionados[l]);
+
+          for (const file of Archivos) {
+            formData.append('files', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
+            formData.append('fileNames', file.name);
+            formData.append('fileExtensions', file.extension);
+          }
+          formData.append('Entidad', valor);
+
           const response = await axios.post(`${getConfig.apiUrl}/enviarEntidades`, formData, {
-              headers: {
-                  'Content-Type': 'multipart/form-data'
-              }
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
           });
+
           if (response.status === 200) {
               numeroArchivosCargos+= 1              
               setnumeroArchivos(numeroArchivosCargos) 
@@ -80,14 +84,14 @@ const EnviarArchivosEntidades = async (Archivos,valoresSeleccionados)=>{
           uploadedFiles += 1;
           newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
           setporcentaje(newPorcentaje);
-          const newFileData = {
-            name: file.name,
-            extension: file.extension,
-            apiResponse: response.data.ayuda,
-            statusText: response.status === 200 ? 'Cargado' : 'Error'
-          };
-          l++
-          setFileData((prevData) => [...prevData, newFileData]);
+          // const newFileData = {
+          //   name: file.name,
+          //   extension: file.extension,
+          //   apiResponse: response.data.ayuda,
+          //   statusText: response.status === 200 ? 'Cargado' : 'Error'
+          // };
+          // l++
+          // setFileData((prevData) => [...prevData, newFileData]);
       }
     
       setTimeout(() => {
