@@ -16,13 +16,13 @@ export const Formulario = (props ) => {
     const [botonVolver,setbotonVolver] = useState(false)
     
     const [dataEntidades,setdataEntidades] = useState(props.epsAPI)
+    const [archivosProcesados, setArchivosProcesados] = useState(props.numeroArchivos);
+    const [numeroArchivosError, setnumeroArchivosError] = useState(props.numeroArchivosError);
     
     useEffect(() => {
         setArchivos(Archivos);
     }, [Archivos]);
     
-    const [archivosProcesados, setArchivosProcesados] = useState(props.numeroArchivos);
-    const [numeroArchivosError, setnumeroArchivosError] = useState(props.numeroArchivosError);
     
     useEffect(() => {
         setArchivosProcesados(props.numeroArchivos);

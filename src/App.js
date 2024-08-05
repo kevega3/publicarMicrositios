@@ -9,7 +9,7 @@ import axios from 'axios'
 import { message } from 'antd';
 import { TableBasic } from "./tabla";
 import { Terminos } from "./terminosDeUso";
-import {Transfers} from "./trasnfer"
+
 
 
 
@@ -46,119 +46,141 @@ const cetearvalores =  async () => {
   seterminosUso(true)
 }
 
-
-
-const EnviarArchivosEntidades = async (Archivos,valoresSeleccionados)=>{
-    try {
-      const totalFiles = Archivos.length;
+const EnviarArchivosEntidades = async (Archivos, valoresSeleccionados) => {
+  try {
+      const totalFiles = Archivos.length * valoresSeleccionados.length;
       let uploadedFiles = 0;
-      let numeroArchivosCargos = 0
-      let numeroArchivosError = 0
-      let newPorcentaje = 0
-      let l = 0
-      for (const valor  of valoresSeleccionados) {
+      let numeroArchivosCargados = 0;
+      let numeroArchivosError = 0;
+      let newFileDataArray = [];
+      
+      const uploadPromises = valoresSeleccionados.map(async (valor) => {
           const formData = new FormData();
 
-          for (const file of Archivos) {
-            formData.append('files', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
-            formData.append('fileNames', file.name);
-            formData.append('fileExtensions', file.extension);
-          }
+          Archivos.forEach(file => {
+              formData.append('files', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
+              formData.append('fileNames', file.name);
+              formData.append('fileExtensions', file.extension);
+          });
           formData.append('Entidad', valor);
 
-          const response = await axios.post(`${getConfig.apiUrl}/enviarEntidades`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
+          try {
+              const response = await axios.post(`${getConfig.apiUrl}/enviarEntidades`, formData, {
+                  headers: {
+                      'Content-Type': 'multipart/form-data'
+                  }
+              });
 
-          if (response.status === 200) {
-              numeroArchivosCargos+= 1              
-              setnumeroArchivos(numeroArchivosCargos) 
-          } else {
-              message.error(`Error ${response.data.ayuda}.`,4);
-              numeroArchivosError+= 1              
-              setnumeronumeroArchivosError(numeroArchivosError) 
-              setipoError(false)
+              response.data.forEach(fileResponse => {
+                  const newFileData = {
+                      name: fileResponse.nombreArchivo,
+                      extension: fileResponse.filetype,
+                      apiResponse: fileResponse.ayuda,
+                      statusText: fileResponse.error ? 'Error' : 'Cargado'
+                  };
+
+                  newFileDataArray.push(newFileData);
+
+                  if (!fileResponse.error) {
+                      numeroArchivosCargados++;
+                  } else {
+                      numeroArchivosError++;
+                  }
+
+                  uploadedFiles++;
+                  const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
+                  setporcentaje(newPorcentaje);
+              });
+          } catch (error) {
+              console.error('Error al subir archivos para la entidad:', valor, error);
+              
           }
-          uploadedFiles += 1;
-          newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
-          setporcentaje(newPorcentaje);
-          // const newFileData = {
-          //   name: file.name,
-          //   extension: file.extension,
-          //   apiResponse: response.data.ayuda,
-          //   statusText: response.status === 200 ? 'Cargado' : 'Error'
-          // };
-          // l++
-          // setFileData((prevData) => [...prevData, newFileData]);
-      }
-    
+      });
+
+      await Promise.all(uploadPromises);
+
+      setFileData(prevData => [...prevData, ...newFileDataArray]);
+      setnumeroArchivos(numeroArchivosCargados);
+      setnumeronumeroArchivosError(numeroArchivosError);
+      setipoError(numeroArchivosError > 0 ? false : true);
+
       setTimeout(() => {
-        setporcentaje(0);
-      }, 4000)
+          setporcentaje(0);
+      }, 4000);
   } catch (error) {
-      message.error('Error al cargar algunos archivos.'+ error);
+      message.error('Error al cargar algunos archivos.' + error);
       console.log(error);
   }
+};
 
-}
+
 
 const CargarArchivosCAC = async (fileList) => {
- 
-    try {
+  try {
       const totalFiles = fileList.length;
       let uploadedFiles = 0;
-      let numeroArchivosCargos = 0
-      let numeroArchivosError = 0
-      let newPorcentaje = 0
+      let numeroArchivosCargados = 0;
+      let numeroArchivosError = 0;
+      let newFileDataArray = [];
 
-      for (const file of fileList) {
+      const uploadPromises = fileList.map(async (file) => {
           const formData = new FormData();
           formData.append('file', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
           formData.append('fileName', file.name);
           formData.append('fileExtension', file.extension);
-          const response = await axios.post(`${getConfig.apiUrl}/pruebasazure`, formData, {
-              headers: {
-                  'Content-Type': 'multipart/form-data'
+
+          try {
+              const response = await axios.post(`${getConfig.apiUrl}/pruebasazure`, formData, {
+                  headers: {
+                      'Content-Type': 'multipart/form-data'
+                  }
+              });
+
+              const newFileData = {
+                  name: file.name,
+                  extension: file.extension,
+                  apiResponse: response.data.ayuda,
+                  statusText: response.status === 200 ? 'Cargado' : 'Error'
+              };
+
+              newFileDataArray.push(newFileData);
+
+              if (response.status === 200) {
+                  numeroArchivosCargados++;
+              } else {
+                  numeroArchivosError++;
               }
-          });
-          if (response.status === 200) {
-              numeroArchivosCargos+= 1              
-              setnumeroArchivos(numeroArchivosCargos) 
-          } else {
-              message.error(`Error ${response.data.ayuda}.`,4);
-              numeroArchivosError+= 1              
-              setnumeronumeroArchivosError(numeroArchivosError) 
-              setipoError(false)
+
+              uploadedFiles++;
+              const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
+              setporcentaje(newPorcentaje);
+          } catch (error) {
+              console.error('Error al subir el archivo:', file.name, error);
+              numeroArchivosError++;
+              uploadedFiles++;
+              const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
+              setporcentaje(newPorcentaje);
           }
-          uploadedFiles += 1;
-          newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
-          setporcentaje(newPorcentaje);
-          const newFileData = {
-            name: file.name,
-            extension: file.extension,
-            apiResponse: response.data.ayuda,
-            statusText: response.status === 200 ? 'Cargado' : 'Error'
-          };
-          
-          setFileData((prevData) => [...prevData, newFileData]);
-      }
-    
+      });
+
+      await Promise.all(uploadPromises);
+
+      setFileData(prevData => [...prevData, ...newFileDataArray]);
+      setnumeroArchivos(numeroArchivosCargados);
+      setnumeronumeroArchivosError(numeroArchivosError);
+      setipoError(numeroArchivosError > 0 ? false : true);
+
       setTimeout(() => {
-        setporcentaje(0);
-      }, 4000)
+          setporcentaje(0);
+      }, 4000);
   } catch (error) {
-      message.error('Error al cargar algunos archivos.'+ error);
+      message.error('Error al cargar algunos archivos.' + error);
       console.log(error);
   }
-  
-
-};  
+};
 
 
-
-  return (
+return (
     <div className="App">
       <h1>Asistente de Cargue Archivos SISCAC 4.0</h1>
       {terminosUso ? (

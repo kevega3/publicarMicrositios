@@ -21,7 +21,7 @@ export const TableBasic = ({ data }) => {
           options: {
             filter: true,
             setCellProps: () => ({style: {whiteSpace:'nowrap'}}),
-            setCellHeaderProps: () => ({style: { backgroundColor: '#17539C', color:"white"}}),
+            setCellHeaderProps: () => ({style: { backgroundColor: '#17539C', color:"white" ,textAlign:'center'}}),
             customBodyRender: (value) => {
               return(
                 <center>
