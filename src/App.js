@@ -46,72 +46,74 @@ const cetearvalores =  async () => {
   seterminosUso(true)
 }
 
-const EnviarArchivosEntidades = async (Archivos, valoresSeleccionados) => {
-  try {
-      const totalFiles = Archivos.length * valoresSeleccionados.length;
-      let uploadedFiles = 0;
-      let numeroArchivosCargados = 0;
-      let numeroArchivosError = 0;
-      let newFileDataArray = [];
-      
-      const uploadPromises = valoresSeleccionados.map(async (valor) => {
-          const formData = new FormData();
+    const EnviarArchivosEntidades = async (Archivos, valoresSeleccionados) => {
+    try {
+        const totalFiles = Archivos.length * valoresSeleccionados.length;
+        let uploadedFiles = 0;
+        let numeroArchivosCargados = 0;
+        let numeroArchivosError = 0;
+        let newFileDataArray = [];
 
-          Archivos.forEach(file => {
-              formData.append('files', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
-              formData.append('fileNames', file.name);
-              formData.append('fileExtensions', file.extension);
-          });
-          formData.append('Entidad', valor);
+        const uploadPromises = valoresSeleccionados.map(async (valor) => {
+            const formData = new FormData();
 
-          try {
-              const response = await axios.post(`${getConfig.apiUrl}/enviarEntidades`, formData, {
-                  headers: {
-                      'Content-Type': 'multipart/form-data'
-                  }
-              });
+            Archivos.forEach(file => {
+                formData.append('files', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
+                formData.append('fileNames', file.name);
+                formData.append('fileExtensions', file.extension);
+            });
+            formData.append('Entidad', valor);
+            try {
+                const response = await axios.post(`${getConfig.apiUrl}/enviarEntidades`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
 
-              response.data.forEach(fileResponse => {
-                  const newFileData = {
-                      name: fileResponse.nombreArchivo,
-                      extension: fileResponse.filetype,
-                      apiResponse: fileResponse.ayuda,
-                      statusText: fileResponse.error ? 'Error' : 'Cargado'
-                  };
+                response.data.forEach(fileResponse => {
+                    const newFileData = {
+                        name: fileResponse.nombreArchivo,
+                        extension: fileResponse.extension,
+                        apiResponse: fileResponse.ayuda,
+                        statusText: fileResponse.error ? 'Error' : 'Cargado',
+                        entidad: fileResponse.entidad 
+                    };
 
-                  newFileDataArray.push(newFileData);
 
-                  if (!fileResponse.error) {
-                      numeroArchivosCargados++;
-                  } else {
-                      numeroArchivosError++;
-                  }
+                    newFileDataArray.push(newFileData);
 
-                  uploadedFiles++;
-                  const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
-                  setporcentaje(newPorcentaje);
-              });
-          } catch (error) {
-              console.error('Error al subir archivos para la entidad:', valor, error);
-              
-          }
-      });
+                    if (!fileResponse.error) {
+                        numeroArchivosCargados++;
+                    } else {
+                        numeroArchivosError++;
+                    }
+                    setipoError(numeroArchivosError > 0 ? false : true);
+                    uploadedFiles++;
+                    const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
+                    setporcentaje(newPorcentaje);
+                });
+            } catch (error) {
+                console.error('Error al subir archivos para la entidad:', valor, error);
+                
+            }
+            
+        });
 
-      await Promise.all(uploadPromises);
+        await Promise.all(uploadPromises);
 
-      setFileData(prevData => [...prevData, ...newFileDataArray]);
-      setnumeroArchivos(numeroArchivosCargados);
-      setnumeronumeroArchivosError(numeroArchivosError);
-      setipoError(numeroArchivosError > 0 ? false : true);
+        setFileData(prevData => [...prevData, ...newFileDataArray]);
+        setnumeroArchivos(numeroArchivosCargados);
+        setnumeronumeroArchivosError(numeroArchivosError);
+        
 
-      setTimeout(() => {
-          setporcentaje(0);
-      }, 4000);
-  } catch (error) {
-      message.error('Error al cargar algunos archivos.' + error);
-      console.log(error);
-  }
-};
+        setTimeout(() => {
+            setporcentaje(0);
+        }, 4000);
+    } catch (error) {
+        message.error('Error al cargar algunos archivos.' + error);
+        console.log(error);
+    }
+    };
 
 
 
@@ -140,7 +142,8 @@ const CargarArchivosCAC = async (fileList) => {
                   name: file.name,
                   extension: file.extension,
                   apiResponse: response.data.ayuda,
-                  statusText: response.status === 200 ? 'Cargado' : 'Error'
+                  statusText: response.status === 200 ? 'Cargado' : 'Error',
+                  entidad: response.data.entidad 
               };
 
               newFileDataArray.push(newFileData);
@@ -150,10 +153,10 @@ const CargarArchivosCAC = async (fileList) => {
               } else {
                   numeroArchivosError++;
               }
-
               uploadedFiles++;
               const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
               setporcentaje(newPorcentaje);
+              setipoError(numeroArchivosError > 0 ? false : true);
           } catch (error) {
               console.error('Error al subir el archivo:', file.name, error);
               numeroArchivosError++;
@@ -164,15 +167,14 @@ const CargarArchivosCAC = async (fileList) => {
       });
 
       await Promise.all(uploadPromises);
-
-      setFileData(prevData => [...prevData, ...newFileDataArray]);
-      setnumeroArchivos(numeroArchivosCargados);
-      setnumeronumeroArchivosError(numeroArchivosError);
-      setipoError(numeroArchivosError > 0 ? false : true);
-
+        setFileData(prevData => [...prevData, ...newFileDataArray]);
+        setnumeroArchivos(numeroArchivosCargados);
+        setnumeronumeroArchivosError(numeroArchivosError);
+        
+        
       setTimeout(() => {
           setporcentaje(0);
-      }, 4000);
+      }, 5000);
   } catch (error) {
       message.error('Error al cargar algunos archivos.' + error);
       console.log(error);

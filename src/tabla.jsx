@@ -65,6 +65,14 @@ export const TableBasic = ({ data }) => {
           },
         },
         {
+          name: "entidad",
+          label: "Entidad",
+          options: {
+            filter: true,
+            setCellHeaderProps: () => ({style: { backgroundColor: '#17539C', color:"white",  textAlign:'Center'}})
+          }
+        },
+        {
           name: "apiResponse",
           label: "Ayuda",
           options: {

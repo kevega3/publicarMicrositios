@@ -7,10 +7,10 @@ export const Bar = (props) => {
       }, [props.tipoError, props.numeroArchivosError]);
 
     const [estado, setEstado] = useState(props.tipoError ? 'active' : 'exception');
+    
     if(props.porjentaje === 100 && estado === 'active'){ 
         message.success('Todos los archivos han sido cargados correctamente.')
     }else if (props.porjentaje === 100 && estado === 'exception'){
-        console.log(props.porjentaje)
         message.warning('Alguno archivos no se cargaron correctamente, porfavor mire los detalles del cargue')
     }
     return (

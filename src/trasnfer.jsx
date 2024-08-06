@@ -76,9 +76,9 @@ const desactivo = () =>{
 }
 const cargarArchivosEntidades = async () => {
     handleOk();
-    
-    await EnviarArchivosEntidades(Archivos,valoresSeleccionados)
     setArchivos([])
+    await EnviarArchivosEntidades(Archivos,valoresSeleccionados)
+    
 }
 
 const locale = {
