@@ -45,33 +45,81 @@ export const Formulario = (props ) => {
     };
 
 
-    const handleBeforeUpload = (file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const fileName = file.name;
+    // const handleBeforeUpload = (file) => {
+    //     const reader = new FileReader();
+    //     reader.onload = (e) => {
+    //         const fileName = file.name;
             
-            const fileExtension =  fileName.split('.')
-            const fileBuffer = e.target.result;
+    //         const fileExtension =  fileName.split('.')
+    //         const fileBuffer = e.target.result;
             
-            setArchivos(prevFileList => [
-                ...prevFileList,
-                {
-                    name: fileName,
-                    extension: fileExtension[1],
-                    buffer: fileBuffer
-                }
-            ]);
-            
+    //         setArchivos(prevFileList => [
+    //             ...prevFileList,
+    //             {
+    //                 name: fileName,
+    //                 extension: fileExtension[1],
+    //                 buffer: fileBuffer
+    //             }
+    //         ]);
+
+                
+                
+        //     };
+        //     reader.readAsArrayBuffer(file); 
+        //     return false;
+        // };
+
+
+        const handleBeforeUpload = (file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const fileName = file.name;
+                const fileExtension = fileName.split('.');
+                const fileBuffer = e.target.result;
+        
+                setArchivos(prevFileList => {
+                    const newFileList = [
+                        ...prevFileList,
+                        {
+                            name: fileName,
+                            extension: fileExtension[1],
+                            buffer: fileBuffer
+                        }
+                    ];
+        
+                    
+                    console.log('Número total de archivos:', newFileList.length);
+        
+                    return newFileList;
+                });
+            };
+            reader.readAsArrayBuffer(file);
+            return false;  
         };
-        reader.readAsArrayBuffer(file); 
-        return false;
-    };
+        
+
     const shouldDisableButton = () => { 
         return Archivos.length === 0; 
     };
     
 
     const EnviarInfo = async (Archivos) => {
+        
+        console.log('Archivos.length'+ Archivos.length)
+        console.log('fileList.length'+ fileList.length)
+        
+
+        setTimeout(async () => {
+            console.log(Archivos.length) // Verificar la longitud de Archivos aquí
+            // Lógica para Swal.fire y manejo de los archivos
+        }, 500);
+
+        
+        if (Archivos.length !== fileList.length) {
+            message.warning('Aún se están procesando archivos. Por favor, espere.');
+            return;
+        }
+        console.log(Archivos.length)
         const result = await Swal.fire({
             title: "¿Está seguro de enviar cargar los archivos?",
             text: "El asistente tomará cada archivo y de acuerdo al nombre del mismo lo alojará en el micrositio de la entidad.",

@@ -118,6 +118,7 @@ const cetearvalores =  async () => {
 
 
 const CargarArchivosCAC = async (fileList) => {
+    console.log(fileList.length)
   try {
       const totalFiles = fileList.length;
       let uploadedFiles = 0;
@@ -132,7 +133,7 @@ const CargarArchivosCAC = async (fileList) => {
           formData.append('fileExtension', file.extension);
 
           try {
-              const response = await axios.post(`${getConfig.apiUrl}/pruebasazure`, formData, {
+              const response = await axios.post(`${getConfig.apiUrl}/pruebasazure2`, formData, {
                   headers: {
                       'Content-Type': 'multipart/form-data'
                   }
