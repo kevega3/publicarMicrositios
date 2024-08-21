@@ -133,7 +133,7 @@ const CargarArchivosCAC = async (fileList) => {
           formData.append('fileExtension', file.extension);
 
           try {
-              const response = await axios.post(`${getConfig.apiUrl}/pruebasazure2`, formData, {
+              const response = await axios.post(`${getConfig.apiUrl}/pruebasazure`, formData, {
                   headers: {
                       'Content-Type': 'multipart/form-data'
                   }

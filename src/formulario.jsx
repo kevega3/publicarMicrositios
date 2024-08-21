@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 import { InboxOutlined,LeftOutlined,SelectOutlined,FileDoneOutlined } from '@ant-design/icons';
 import { message, Upload, Button  } from 'antd';
 import { Col, Row } from 'antd';
-import {Transfers} from './trasnfer' 
+import {Transfers} from './trasnfer'
 import { gold,green,blue } from '@ant-design/colors';
 import './css/uploadfiles.css';
 
@@ -14,20 +14,22 @@ export const Formulario = (props ) => {
     const [fileList, setFileList] = useState([]);
     const [Archivos, setArchivos] = useState([]);
     const [botonVolver,setbotonVolver] = useState(false)
-    
+
     const [dataEntidades,setdataEntidades] = useState(props.epsAPI)
     const [archivosProcesados, setArchivosProcesados] = useState(props.numeroArchivos);
     const [numeroArchivosError, setnumeroArchivosError] = useState(props.numeroArchivosError);
-    
+
     useEffect(() => {
-        setArchivos(Archivos);
+        const archivosCount = Archivos.length;
+        console.log('Número total de archivos en Archivos:', archivosCount);
     }, [Archivos]);
-    
-    
+
+
+
     useEffect(() => {
         setArchivosProcesados(props.numeroArchivos);
-        
-    }, [props.numeroArchivos]); 
+
+    }, [props.numeroArchivos]);
 
     const _habilitarBoton = () => {
         return botonVolver;
@@ -35,39 +37,14 @@ export const Formulario = (props ) => {
 
     useEffect(() => {
         setnumeroArchivosError(props.numeroArchivosError);
-        
-    }, [props.numeroArchivosError]); 
+
+    }, [props.numeroArchivosError]);
 
     const handleResetFileList = () => {
         setFileList([]);
         props.cetearvalores()
-        
+
     };
-
-
-    // const handleBeforeUpload = (file) => {
-    //     const reader = new FileReader();
-    //     reader.onload = (e) => {
-    //         const fileName = file.name;
-            
-    //         const fileExtension =  fileName.split('.')
-    //         const fileBuffer = e.target.result;
-            
-    //         setArchivos(prevFileList => [
-    //             ...prevFileList,
-    //             {
-    //                 name: fileName,
-    //                 extension: fileExtension[1],
-    //                 buffer: fileBuffer
-    //             }
-    //         ]);
-
-                
-                
-        //     };
-        //     reader.readAsArrayBuffer(file); 
-        //     return false;
-        // };
 
 
         const handleBeforeUpload = (file) => {
@@ -76,7 +53,7 @@ export const Formulario = (props ) => {
                 const fileName = file.name;
                 const fileExtension = fileName.split('.');
                 const fileBuffer = e.target.result;
-        
+
                 setArchivos(prevFileList => {
                     const newFileList = [
                         ...prevFileList,
@@ -86,35 +63,23 @@ export const Formulario = (props ) => {
                             buffer: fileBuffer
                         }
                     ];
-        
-                    
+
+
                     console.log('Número total de archivos:', newFileList.length);
-        
+
                     return newFileList;
                 });
             };
             reader.readAsArrayBuffer(file);
-            return false;  
+            return false;
         };
-        
 
-    const shouldDisableButton = () => { 
-        return Archivos.length === 0; 
+
+    const shouldDisableButton = () => {
+        return Archivos.length === 0;
     };
-    
 
     const EnviarInfo = async (Archivos) => {
-        
-        console.log('Archivos.length'+ Archivos.length)
-        console.log('fileList.length'+ fileList.length)
-        
-
-        setTimeout(async () => {
-            console.log(Archivos.length) // Verificar la longitud de Archivos aquí
-            // Lógica para Swal.fire y manejo de los archivos
-        }, 500);
-
-        
         if (Archivos.length !== fileList.length) {
             message.warning('Aún se están procesando archivos. Por favor, espere.');
             return;
@@ -166,16 +131,16 @@ export const Formulario = (props ) => {
     const handleOnDrop = (e) => {
         e.preventDefault();
         const { items } = e.dataTransfer;
-    
+
 
         Array.from(items).forEach(item => {
             if (item.kind === 'file') {
-                
+
                 const file = item.getAsFile();
-                
+
                 handleBeforeUpload(file);
             } else if (item.kind === 'directory') {
-                
+
                 const directoryReader = item.webkitGetAsEntry().createReader();
                 directoryReader.readEntries(entries => {
                     entries.forEach(entry => {
@@ -201,26 +166,26 @@ export const Formulario = (props ) => {
         onChange: handleOnChange,
         onDrop:handleOnDrop
     };
-    
+
     return (
-        <div className='ContenedorGeneralUpload'> 
+        <div className='ContenedorGeneralUpload'>
 
 
 
-            {fileList.length === 0 && ( 
+            {fileList.length === 0 && (
             <Dragger {...propss}>
                 <p className="ant-upload-drag-icon">
                     <InboxOutlined />
                 </p>
                 <p className="ant-upload-text">Haga clic o arrastre la carpeta a esta área para cargarla.</p>
                 <p className="ant-upload-hint">Soporte para una carga única o masiva. Está estrictamente prohibido cargar datos de la empresa u otros archivos prohibidos.</p>
-                
+
             </Dragger>
             )}
 
             <br/>
-            
-            {fileList.length > 0 && ( 
+
+            {fileList.length > 0 && (
                 <><Row className='contedorArchivosProcesados'>
                     <Col span={8}>
                         <h2>Resultados del análisis:</h2>
@@ -234,9 +199,9 @@ export const Formulario = (props ) => {
                         )}
                     </Col>
                 <Row>
-                </Row>    
+                </Row>
                 <Row>
-                    
+
                 </Row  >
                     <Col span={16} justify="end" align="end">
                     <h2>Seleccione el tipo cargue</h2>
@@ -249,11 +214,11 @@ export const Formulario = (props ) => {
                             disabled={shouldDisableButton()}
                         >Cargue por nombres archivos
                         </Button>
-                        
 
-                        <Transfers 
+
+                        <Transfers
                             epsAPI = {dataEntidades}
-                            funciondesabilitar={shouldDisableButton}  
+                            funciondesabilitar={shouldDisableButton}
                             EnviarArchivosEntidades={props.funcionEnviar}
                             Archivos = {Archivos}
                             setArchivos={setArchivos}
@@ -270,11 +235,11 @@ export const Formulario = (props ) => {
                         >Volver
                         </Button>
                     </Col>
-                    
+
                 </Row><Row>
                     </Row></>
-            )}   
-            
+            )}
+
         </div>
     );
 };
