@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import {Login} from './login.jsx'
 import App from './App';
 import axios from 'axios'
 import getConfig  from './config.json';
-import {Spin } from 'antd';
-
+import {Spin  } from 'antd';
+import { Flex, Layout } from 'antd';
+const { Header, Footer, Sider, Content } = Layout;
 const Index = () => {
   const [Parametros, setParametros] = useState([]);
+  
+  const [Usuario, setUsuario] = useState(localStorage.getItem('usuario'));
+
+  const isAuthenticated = () => {
+    return Usuario !== null;
+  };
 
   const contentStyle = {
-    padding: 50,
+    padding: 10,
     display: 'grid',
     justifyContent: 'center',
     alignItems: 'center',
@@ -30,15 +38,21 @@ const Index = () => {
   }, []);
 
   return (
-    <>
-    {Parametros.hasOwnProperty('epsCargueAzure')  && Parametros.hasOwnProperty('parametrosCargueAzure') ? (
-      <App data={Parametros} />
-    ) : (
-      <Spin tip="Cargado..." size="large">
-        {content}
-      </Spin>
-    )}
-  </>
+    <Content style={contentStyle}>
+    {Usuario ? (
+              <>
+                {Parametros.hasOwnProperty('epsCargueAzure') && Parametros.hasOwnProperty('parametrosCargueAzure') ? (
+                  <App data={Parametros} />
+                ) : (
+                  <Spin tip="Cargado..." size="large">
+                    {content}
+                  </Spin>
+                )}
+              </>
+            ) : (
+              <Login setUsuario={setUsuario} />
+            )}
+    </Content>
 
   );
 };

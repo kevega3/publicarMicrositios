@@ -47,139 +47,158 @@ const cetearvalores =  async () => {
 }
 
     const EnviarArchivosEntidades = async (Archivos, valoresSeleccionados) => {
-    try {
-        const totalFiles = Archivos.length * valoresSeleccionados.length;
-        let uploadedFiles = 0;
-        let numeroArchivosCargados = 0;
-        let numeroArchivosError = 0;
-        let newFileDataArray = [];
-
-        const uploadPromises = valoresSeleccionados.map(async (valor) => {
-            const formData = new FormData();
-
-            Archivos.forEach(file => {
-                formData.append('files', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
-                formData.append('fileNames', file.name);
-                formData.append('fileExtensions', file.extension);
-            });
-            formData.append('Entidad', valor);
-            try {
-                const response = await axios.post(`${getConfig.apiUrl}/enviarEntidades`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
+    const token = localStorage.getItem('usuario');
+    console.log(token)
+    if (token) {
+        try {
+            const totalFiles = Archivos.length * valoresSeleccionados.length;
+            let uploadedFiles = 0;
+            let numeroArchivosCargados = 0;
+            let numeroArchivosError = 0;
+            let newFileDataArray = [];
+    
+            const uploadPromises = valoresSeleccionados.map(async (valor) => {
+                const formData = new FormData();
+    
+                Archivos.forEach(file => {
+                    formData.append('files', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
+                    formData.append('fileNames', file.name);
+                    formData.append('fileExtensions', file.extension);
+                    formData.append('usuario', token);
                 });
-
-                response.data.forEach(fileResponse => {
-                    const newFileData = {
-                        name: fileResponse.nombreArchivo,
-                        extension: fileResponse.extension,
-                        apiResponse: fileResponse.ayuda,
-                        statusText: fileResponse.error ? 'Error' : 'Cargado',
-                        entidad: fileResponse.entidad 
-                    };
-
-
-                    newFileDataArray.push(newFileData);
-
-                    if (!fileResponse.error) {
-                        numeroArchivosCargados++;
-                    } else {
-                        numeroArchivosError++;
-                    }
-                    setipoError(numeroArchivosError > 0 ? false : true);
-                    uploadedFiles++;
-                    const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
-                    setporcentaje(newPorcentaje);
-                });
-            } catch (error) {
-                console.error('Error al subir archivos para la entidad:', valor, error);
+                formData.append('Entidad', valor);
+                try {
+                    const response = await axios.post(`${getConfig.apiUrl}/enviarEntidades`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    });
+    
+                    response.data.forEach(fileResponse => {
+                        const newFileData = {
+                            name: fileResponse.nombreArchivo,
+                            extension: fileResponse.extension,
+                            apiResponse: fileResponse.ayuda,
+                            statusText: fileResponse.error ? 'Error' : 'Cargado',
+                            entidad: fileResponse.entidad 
+                        };
+    
+    
+                        newFileDataArray.push(newFileData);
+    
+                        if (!fileResponse.error) {
+                            numeroArchivosCargados++;
+                        } else {
+                            numeroArchivosError++;
+                        }
+                        setipoError(numeroArchivosError > 0 ? false : true);
+                        uploadedFiles++;
+                        const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
+                        setporcentaje(newPorcentaje);
+                    });
+                } catch (error) {
+                    console.error('Error al subir archivos para la entidad:', valor, error);
+                    
+                }
                 
-            }
+            });
+    
+            await Promise.all(uploadPromises);
+    
+            setFileData(prevData => [...prevData, ...newFileDataArray]);
+            setnumeroArchivos(numeroArchivosCargados);
+            setnumeronumeroArchivosError(numeroArchivosError);
             
-        });
-
-        await Promise.all(uploadPromises);
-
-        setFileData(prevData => [...prevData, ...newFileDataArray]);
-        setnumeroArchivos(numeroArchivosCargados);
-        setnumeronumeroArchivosError(numeroArchivosError);
-        
-
-        setTimeout(() => {
-            setporcentaje(0);
-        }, 4000);
-    } catch (error) {
-        message.error('Error al cargar algunos archivos.' + error);
-        console.log(error);
+    
+            setTimeout(() => {
+                setporcentaje(0);
+            }, 4000);
+        } catch (error) {
+            message.error('Error al cargar algunos archivos.' + error);
+            console.log(error);
+        }
+    }else{
+        message.error('No se encuentra logeado en la aplicacion, error critico');
+        return;
     }
+   
     };
 
 
 
 const CargarArchivosCAC = async (fileList) => {
-    console.log(fileList.length)
-  try {
-      const totalFiles = fileList.length;
-      let uploadedFiles = 0;
-      let numeroArchivosCargados = 0;
-      let numeroArchivosError = 0;
-      let newFileDataArray = [];
+    const token = localStorage.getItem('usuario');
+    if (token) {
+            try {
+                const totalFiles = fileList.length;
+                let uploadedFiles = 0;
+                let numeroArchivosCargados = 0;
+                let numeroArchivosError = 0;
+                let newFileDataArray = [];
 
-      const uploadPromises = fileList.map(async (file) => {
-          const formData = new FormData();
-          formData.append('file', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
-          formData.append('fileName', file.name);
-          formData.append('fileExtension', file.extension);
+                const uploadPromises = fileList.map(async (file) => {
+                    const formData = new FormData();
+                    formData.append('file', new Blob([file.buffer], { type: 'application/octet-stream' }), file.name);
+                    formData.append('fileName', file.name);
+                    formData.append('fileExtension', file.extension);
+                    formData.append('usuario', token);
+                    try {
+                        const response = await axios.post(`${getConfig.apiUrl}/pruebasazure`, formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        });
 
-          try {
-              const response = await axios.post(`${getConfig.apiUrl}/pruebasazure`, formData, {
-                  headers: {
-                      'Content-Type': 'multipart/form-data'
-                  }
-              });
+                        const newFileData = {
+                            name: file.name,
+                            extension: file.extension,
+                            apiResponse: response.data.ayuda,
+                            statusText: response.status === 200 ? 'Cargado' : 'Error',
+                            entidad: response.data.entidad 
+                        };
 
-              const newFileData = {
-                  name: file.name,
-                  extension: file.extension,
-                  apiResponse: response.data.ayuda,
-                  statusText: response.status === 200 ? 'Cargado' : 'Error',
-                  entidad: response.data.entidad 
-              };
+                        newFileDataArray.push(newFileData);
 
-              newFileDataArray.push(newFileData);
+                        if (response.status === 200) {
+                            numeroArchivosCargados++;
+                        } else {
+                            numeroArchivosError++;
+                        }
+                        uploadedFiles++;
+                        const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
+                        setporcentaje(newPorcentaje);
+                        setipoError(numeroArchivosError > 0 ? false : true);
+                    } catch (error) {
+                        console.error('Error al subir el archivo:', file.name, error);
+                        numeroArchivosError++;
+                        uploadedFiles++;
+                        const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
+                        setporcentaje(newPorcentaje);
+                    }
+                });
 
-              if (response.status === 200) {
-                  numeroArchivosCargados++;
-              } else {
-                  numeroArchivosError++;
-              }
-              uploadedFiles++;
-              const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
-              setporcentaje(newPorcentaje);
-              setipoError(numeroArchivosError > 0 ? false : true);
-          } catch (error) {
-              console.error('Error al subir el archivo:', file.name, error);
-              numeroArchivosError++;
-              uploadedFiles++;
-              const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
-              setporcentaje(newPorcentaje);
-          }
-      });
+                await Promise.all(uploadPromises);
+                    setFileData(prevData => [...prevData, ...newFileDataArray]);
+                    setnumeroArchivos(numeroArchivosCargados);
+                    setnumeronumeroArchivosError(numeroArchivosError);
+                    
+                    
+                setTimeout(() => {
+                    setporcentaje(0);
+                }, 5000);
+            } catch (error) {
+                message.error('Error al cargar algunos archivos.' + error);
+                console.log(error);
+            }
 
-      await Promise.all(uploadPromises);
-        setFileData(prevData => [...prevData, ...newFileDataArray]);
-        setnumeroArchivos(numeroArchivosCargados);
-        setnumeronumeroArchivosError(numeroArchivosError);
+
+    } else {
         
-        
-      setTimeout(() => {
-          setporcentaje(0);
-      }, 5000);
-  } catch (error) {
-      message.error('Error al cargar algunos archivos.' + error);
-      console.log(error);
-  }
+        message.error('No se encuentra logeado en la aplicacion, error critico');
+        return;
+    }
+
+
 };
 
 

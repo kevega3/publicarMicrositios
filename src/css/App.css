@@ -7,3 +7,6 @@ html {
 h1{
   text-align: center;
 }
+.App{
+  min-width: 100%
+}
