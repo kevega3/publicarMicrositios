@@ -22,7 +22,7 @@ export const Terminos = (props) => {
                 <li>El asistente ofrece dos tipos de cargue de archivos:
                     <ul>
                         <li><b>Cargue por nombre del archivo:</b> Debe asegurarse de que cada archivo siga esta estructura: <b>CodigoEntidad-Enfermedad-CarpetaContenedora-NombreArchivo</b>.</li>
-                        <li><b>Cargue general a entidades:</b> Este método enviará los archivos seleccionados a las entidades que elija en el micrositio.</li>
+                        <li><b>Cargue general a entidades:</b> Este método enviará los archivos seleccionados a las entidades que elija en el micrositio, se necesita esta estructura en el nombre del archivo: <b>Enfermedad-CarpetaContenedora-NombreArchivo</b></li>
                     </ul>
                 </li>
                 <li>Los tipos de archivos permitidos dentro de las carpetas son: <b>{ParametrosString}</b>. Los archivos que no cumplan con estos formatos no serán cargados.</li>
