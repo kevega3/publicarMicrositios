@@ -62,10 +62,11 @@ export const Login = ({setUsuario}) => {
                 })
                 .catch(error => {
                     pauseLoading(3);
+                    let MensajeAmigable = error.response.data.ayuda || 'Error Desconocido'
                     Swal.fire({
                         icon: "error",
                         title: "Oops...",
-                        text: error,
+                        text: MensajeAmigable,
                     });
                 });
         } catch (err) {

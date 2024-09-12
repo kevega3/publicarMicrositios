@@ -143,7 +143,7 @@ const CargarArchivosCAC = async (fileList) => {
                     formData.append('fileExtension', file.extension);
                     formData.append('usuario', token);
                     try {
-                        const response = await axios.post(`${getConfig.apiUrl}/pruebasazure`, formData, {
+                        const response = await axios.post(`${getConfig.apiUrl}/cargueAzure`, formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data'
                             }
@@ -169,10 +169,23 @@ const CargarArchivosCAC = async (fileList) => {
                         setporcentaje(newPorcentaje);
                         setipoError(numeroArchivosError > 0 ? false : true);
                     } catch (error) {
-                        console.error('Error al subir el archivo:', file.name, error);
+
+
+                        let MensajeAmigable = error.response.data.ayuda || 'Error Desconocido'
+
+                        const newFileData = {
+                            name: file.name,
+                            extension: error. file.extension,
+                            apiResponse: MensajeAmigable,
+                            statusText: 'Error',
+                            entidad: 'ERROR'
+                        };
+
+                        newFileDataArray.push(newFileData);
                         numeroArchivosError++;
                         uploadedFiles++;
                         const newPorcentaje = Math.round((uploadedFiles / totalFiles) * 100);
+
                         setporcentaje(newPorcentaje);
                     }
                 });

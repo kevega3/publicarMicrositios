@@ -26,6 +26,7 @@ export const Terminos = (props) => {
                     </ul>
                 </li>
                 <li>Los tipos de archivos permitidos dentro de las carpetas son: <b>{ParametrosString}</b>. Los archivos que no cumplan con estos formatos no serán cargados.</li>
+                <li><b>Cargue al Micrositio de Distribución de Recursos</b> Si desea cargar archivos al micrositio de distribución de recursos, debe seguir la estructura de nombre de archivo especificada anteriormente, con una pequeña variante: agregue la palabra <b>DISTRIBUCION</b>. al inicio del nombre del archivo seguido de la estructura mencionada.</li>
                 <li><b>El Asistente de Cargue recorrerá todos los archivos en el directorio seleccionado, filtrará los archivos permitidos y validará el nombre de cada archivo.</b></li>
             </ol>
                     

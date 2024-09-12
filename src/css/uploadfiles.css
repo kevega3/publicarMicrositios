@@ -11,6 +11,13 @@
     min-height:150px ;
 }
 
+@media (min-width: 1280px) {
+    .contedorArchivosProcesados {
+        min-width: 1200px;
+    }
+}
+
+
 .errorArchivos{
     font-weight: bold;
     color: red;
